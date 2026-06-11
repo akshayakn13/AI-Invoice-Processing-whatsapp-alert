@@ -114,6 +114,19 @@ Automated WhatsApp messages include:
 
 ---
 
+## 🎥 Project Demo
+
+👉 **[Watch the Full Workflow Demo](./final.mp4)**
+
+This demo showcases:
+
+- Invoice upload
+- AI invoice processing
+- Google Sheets integration
+- Due date tracking
+- Automated WhatsApp reminders
+- Overdue payment follow-ups
+
 ## 📸 Screenshots
 
 ### Complete Workflow
