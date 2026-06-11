@@ -1,0 +1,652 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Invoice Processing System",
+        "formDescription": "Upload your invoice PDF and receive an AI-generated invoice analysis report.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Email Address",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Upload Invoice",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Vendor WhatsApp Number",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -224,
+        -336
+      ],
+      "id": "b0246db9-6854-4974-8d27-046672ec655e",
+      "name": "On form submission",
+      "webhookId": "eace1346-6301-40cb-ba56-9d8aea3fb1fb"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Upload_Invoice",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        -336
+      ],
+      "id": "5774a8cc-8cba-4b1f-87e9-8255c9c90d4c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert Accounts Payable and Invoice Processing Assistant.\n\nAnalyze the invoice text provided and extract the following information accurately.\n\nReturn the response ONLY in the structured format specified by the output parser.\n\nExtraction Rules:\n\n1. invoice_number\n- Extract the invoice number or bill number.\n- If not found, return \"Not Available\".\n\n2. vendor\n- Extract the company or vendor name issuing the invoice.\n- If not found, return \"Not Available\".\n\n3. invoice_date\n- Extract the invoice date.\n- Convert to DD-MMM-YYYY format when possible.\n- If not found, return \"Not Available\".\n\n4. due_date\n- Extract the payment due date.\n- Convert to DD-MMM-YYYY format when possible.\n- If not found, return \"Not Available\".\n\n5. amount\n- Extract the final invoice amount payable.\n- Return numbers only without currency symbols.\n- Example: 935.00\n\n6. tax\n- Extract tax amount if available.\n- Return numbers only.\n- If no tax is present, return \"0\".\n\n7. currency\n- Extract the invoice currency.\n- Examples: USD, INR, EUR, GBP.\n- If unclear, infer from the invoice when possible.\n\n8. category\n\nClassify into ONE category only:\n\nSoftware\nMarketing\nProfessional Services\nOffice Supplies\nTravel\nUtilities\nPayroll\nHardware\nOther\n\n9. payment_status\n\nAllowed values:\n- Paid\n- Unpaid\n- Pending\n- Unknown\n\n10. confidence_score\n\nReturn a number between 0 and 100.\n\nGuidelines:\n- 95-100 = All key fields clearly visible.\n- 85-94 = Minor uncertainty.\n- 70-84 = Some fields inferred.\n- Below 70 = Significant uncertainty.\n\n11. review_required\n\nReturn \"Yes\" if:\n- confidence_score < 80\n- vendor is missing\n- invoice number is missing\n- due date is missing\n- amount > 5000\n- invoice contains ambiguous information\n\nOtherwise return:\n- No\n\n12. risk_level\n\nHigh:\n- amount > 5000\nOR\n- review_required = Yes\nOR\n- confidence_score < 80\n\nMedium:\n- amount between 2000 and 5000\n\nLow:\n- amount < 2000 AND confidence_score >= 80\n\nReturn only:\n- High\n- Medium\n- Low\n\n13. summary\n\nGenerate a concise business summary in 1-2 sentences.\n\nMention:\n- Vendor\n- Invoice purpose\n- Total amount\n\nIMPORTANT:\n- Do not invent data.\n- Use \"Not Available\" when information is missing.\n- Return ONLY the structured output required by the parser.\n- Use ONLY the invoice text provided below.\n\n=========================\nINVOICE TEXT\n=========================\n\n{{ $json.text }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        304,
+        -352
+      ],
+      "id": "0f0da37b-c4c1-4c3f-af3d-d0bbe28e9b97",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"invoice_number\": \"string\",\n  \"vendor\": \"string\",\n  \"invoice_date\": \"string\",\n  \"due_date\": \"string\",\n  \"amount\": \"string\",\n  \"tax\": \"string\",\n  \"currency\": \"string\",\n  \"category\": \"string\",\n  \"payment_status\": \"string\",\n  \"confidence_score\": 0,\n  \"review_required\": \"string\",\n  \"risk_level\": \"string\",\n  \"summary\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        -32
+      ],
+      "id": "95efdfa3-580c-48c5-825e-bdd5653a83b1",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1z94c6LU1r65gM7unbc-ysm8nb4J4IQRLoUR-ZNxvMCs",
+          "mode": "list",
+          "cachedResultName": "Invoice_Processing_ReportInvoice Number",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z94c6LU1r65gM7unbc-ysm8nb4J4IQRLoUR-ZNxvMCs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z94c6LU1r65gM7unbc-ysm8nb4J4IQRLoUR-ZNxvMCs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{$node[\"Basic LLM Chain\"].json.output.invoice_number}}",
+            "Vendor": "={{$node[\"Basic LLM Chain\"].json.output.vendor}}",
+            "Invoice Date": "={{$node[\"Basic LLM Chain\"].json.output.invoice_date}}",
+            "Due Date": "={{$node[\"Basic LLM Chain\"].json.output.due_date}}",
+            "Amount": "={{$node[\"Basic LLM Chain\"].json.output.amount}}",
+            "Tax": "={{$node[\"Basic LLM Chain\"].json.output.tax}}",
+            "Currency": "={{$node[\"Basic LLM Chain\"].json.output.currency}}",
+            "Category": "={{$node[\"Basic LLM Chain\"].json.output.category}}",
+            "Payment Status": "={{$node[\"Basic LLM Chain\"].json.output.payment_status}}",
+            "Confidence Score": "={{$node[\"Basic LLM Chain\"].json.output.confidence_score}}",
+            "Review Required": "={{$node[\"Basic LLM Chain\"].json.output.review_required}}",
+            "Summary": "={{$node[\"Basic LLM Chain\"].json.output.summary}}",
+            "Processed Date": "={{new Date().toISOString()}}",
+            "Risk Level": "={{$node[\"Basic LLM Chain\"].json.output.risk_level}}",
+            "Vendor WhatsApp": "={{$('On form submission').item.json['Vendor WhatsApp Number']}}",
+            "Reminder Sent": "No"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor",
+              "displayName": "Vendor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Invoice Date",
+              "displayName": "Invoice Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tax",
+              "displayName": "Tax",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risk Level",
+              "displayName": "Risk Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Payment Status",
+              "displayName": "Payment Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processed Date",
+              "displayName": "Processed Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Confidence Score",
+              "displayName": "Confidence Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Review Required",
+              "displayName": "Review Required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor WhatsApp",
+              "displayName": "Vendor WhatsApp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reminder Sent",
+              "displayName": "Reminder Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        -192
+      ],
+      "id": "d683a27c-f1c8-4575-9e75-a39d1f1d56f4",
+      "name": "Append row in sheet",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1NmdFH968aSwp0Zm",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$node[\"On form submission\"].json[\"Email Address\"]}}",
+        "subject": "=Invoice Processed Successfully - {{$json.output.invoice_number}}",
+        "message": "=<h2>Invoice Processing Report</h2>\n\n<p>Hello {{$node[\"On form submission\"].json[\"Full Name\"]}},</p>\n\n<p>Your invoice has been successfully processed.</p>\n\n<table border=\"1\" cellpadding=\"8\" cellspacing=\"0\">\n<tr>\n<td><b>Invoice Number</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.invoice_number}}</td>\n</tr>\n\n<tr>\n<td><b>Vendor</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.vendor}}</td>\n</tr>\n\n<tr>\n<td><b>Invoice Date</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.invoice_date}}</td>\n</tr>\n\n<tr>\n<td><b>Due Date</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.due_date}}</td>\n</tr>\n\n<tr>\n<td><b>Amount</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.amount}} {{$node[\"Basic LLM Chain\"].json.output.currency}}</td>\n</tr>\n\n<tr>\n<td><b>Tax</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.tax}}</td>\n</tr>\n\n<tr>\n<td><b>Category</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.category}}</td>\n</tr>\n\n<tr>\n<td><b>Payment Status</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.payment_status}}</td>\n</tr>\n\n<tr>\n<td><b>Confidence Score</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.confidence_score}}%</td>\n</tr>\n\n<tr>\n<td><b>Risk Level</b></td>\n<td>{{$node[\"Basic LLM Chain\"].json.output.risk_level}}</td>\n</tr>\n</table>\n\n<h3>Summary</h3>\n\n<p>{{$node[\"Basic LLM Chain\"].json.output.summary}}</p>\n\n<hr>\n\n<p>\nGenerated automatically by the AI Invoice Processing System.\n</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        -144
+      ],
+      "id": "e1d5b0f9-f711-4663-86a7-4ddf1bf81df9",
+      "name": "Send a message",
+      "webhookId": "c324ee39-b02b-40bc-af78-9e867f468fcd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JdwI1IPGaNDiMquH",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1e6c581-c1db-4e04-975c-e42a5d715c4a",
+              "leftValue": "={{$json.output.review_required}}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "f79566f4-b07a-44c7-a276-495da2d8cccb",
+              "leftValue": "={{$json.output.risk_level}}",
+              "rightValue": "High",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1088,
+        -224
+      ],
+      "id": "d70a737e-8aed-4ce5-b879-de5e3ccf6e6c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$node[\"On form submission\"].json[\"Email Address\"]}}",
+        "subject": "=⚠ Manual Review Required - {{$node[\"Basic LLM Chain\"].json.output.invoice_number}}",
+        "message": "=<h2>⚠ Invoice Requires Manual Review</h2>\n\n<p><strong>Invoice Number:</strong> {{$node[\"Basic LLM Chain\"].json.output.invoice_number}}</p>\n\n<p><strong>Vendor:</strong> {{$node[\"Basic LLM Chain\"].json.output.vendor}}</p>\n\n<p><strong>Amount:</strong> {{$node[\"Basic LLM Chain\"].json.output.amount}} {{$node[\"Basic LLM Chain\"].json.output.currency}}</p>\n\n<p><strong>Confidence Score:</strong> {{$node[\"Basic LLM Chain\"].json.output.confidence_score}}</p>\n\n<p><strong>Risk Level:</strong> {{$node[\"Basic LLM Chain\"].json.output.risk_level}}</p>\n\n<p><strong>Review Required:</strong> {{$node[\"Basic LLM Chain\"].json.output.review_required}}</p>\n\n<p><strong>Summary:</strong> {{$node[\"Basic LLM Chain\"].json.output.summary}}</p>\n\n<hr>\n\n<p><strong>Action Required:</strong> Please manually verify this invoice before approval.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        -352
+      ],
+      "id": "69b0974b-7243-4bb5-bb85-0493ed558388",
+      "name": "Send a message1",
+      "webhookId": "6a55f713-8231-45de-9ea8-4aadbdcb6e56",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JdwI1IPGaNDiMquH",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1z94c6LU1r65gM7unbc-ysm8nb4J4IQRLoUR-ZNxvMCs",
+          "mode": "list",
+          "cachedResultName": "Invoice_Processing_ReportInvoice Number",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z94c6LU1r65gM7unbc-ysm8nb4J4IQRLoUR-ZNxvMCs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1z94c6LU1r65gM7unbc-ysm8nb4J4IQRLoUR-ZNxvMCs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Invoice Number",
+              "lookupValue": "={{$node[\"Basic LLM Chain\"].json.output.invoice_number}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        -352
+      ],
+      "id": "b61a4ff2-c281-4685-952c-3a2ecb4e923d",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1NmdFH968aSwp0Zm",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "696dea8c-e9d4-4621-be69-d0eba1cab44c",
+              "leftValue": "={{ Object.keys($json).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        -352
+      ],
+      "id": "ac76cfca-909a-4002-b6f7-ae64ab28a947",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$node[\"On form submission\"].json[\"Email Address\"]}}",
+        "subject": "Duplicate Invoice Detected",
+        "message": "Invoice Number already exists in the system.  Processing stopped to prevent duplicate entry.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        -400
+      ],
+      "id": "6296c379-6484-4c59-8713-c7d38a55e11e",
+      "name": "Send a message2",
+      "webhookId": "a94cf9bd-3245-4423-95a3-311b253a5c44",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JdwI1IPGaNDiMquH",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Get Rows checking for any duplicate entry in google sheet, if duplicate entry present then gmail message for duplicate entry, else to append row in sheet"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        688,
+        -544
+      ],
+      "id": "b6e10336-1458-4131-bc63-35f51cf791df",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        -144
+      ],
+      "id": "d8a04ee1-d900-4b94-adcb-317c88370a60",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OmLSRpqfCtq74Ad1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "298b0922-8d4b-4dc9-8cce-8e6555d7c7c4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "42a63ec638b4c5852a90f6d631375659949a654660fccabb265195d54543950e"
+  },
+  "nodeGroups": [],
+  "id": "9rLPt2YKpChoIpAA",
+  "tags": []
+}
