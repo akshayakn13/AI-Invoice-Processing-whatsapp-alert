@@ -134,7 +134,7 @@ Automated WhatsApp messages include:
 
 ## 🎥 Live Demo
 
-[![Watch Demo](https://img.shields.io/badge/🎥-Watch_Demo-blue?style=for-the-badge)](./demo/final.mp4)
+[![Watch Demo](https://img.shields.io/badge/🎥-Watch_Demo-blue?style=for-the-badge)](demo/final.mp4)
 
 
 ---
