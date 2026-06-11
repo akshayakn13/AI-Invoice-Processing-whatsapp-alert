@@ -132,6 +132,10 @@ Automated WhatsApp messages include:
 ### Gmail
 ![Gmail](screenshots/mail.png)
 
+## 🎥 Live Demo
+
+[![Watch Demo](https://img.shields.io/badge/🎥-Watch_Demo-blue?style=for-the-badge)](./demo/final.mp4)
+
 
 ---
 
