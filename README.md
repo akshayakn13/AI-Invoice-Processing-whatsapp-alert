@@ -118,19 +118,20 @@ Automated WhatsApp messages include:
 
 ### Complete Workflow
 
-![Workflow Overview](screenshots/workflow-overview.png)
-
-### Invoice Upload
-
-![Invoice Upload](screenshots/invoice-upload.png)
+![Workflow Overview](screenshots/invoice_processing_w1.png)
+![Workflow Overview](screenshots/reminder_workflow.png)
 
 ### Google Sheets Tracking
 
-![Google Sheet](screenshots/google-sheet-update.png)
+![Google Sheet](screenshots/sheet_output.png)
 
 ### WhatsApp Reminder
 
-![WhatsApp Reminder](screenshots/whatsapp-reminder.png)
+![WhatsApp Reminder](screenshots/whatsap.png)
+
+### Gmail
+![Gmail](screenshots/mail.png)
+
 
 ---
 
