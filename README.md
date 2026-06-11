@@ -132,9 +132,20 @@ Automated WhatsApp messages include:
 ### Gmail
 ![Gmail](screenshots/mail.png)
 
-## 🎥 Live Demo
+## 🎥 Project Demo
 
-[![Watch Demo](https://img.shields.io/badge/🎥-Watch_Demo-blue?style=for-the-badge)](demo/final.mp4)
+Watch the complete workflow demonstration below:
+
+➡️ **[View Demo Video](./demo/final.mp4)**
+
+The demo showcases:
+
+- Invoice upload process
+- Automated invoice data extraction
+- Google Sheets record creation
+- Due date tracking
+- WhatsApp payment reminders
+- Overdue invoice follow-up automation
 
 
 ---
